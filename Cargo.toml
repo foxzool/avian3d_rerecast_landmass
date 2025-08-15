@@ -1,0 +1,11 @@
+[package]
+name = "avian3d_rerecast_landmass"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+avian3d = "0.3"
+bevy = { version = "0.16", features = ["bevy_remote"] }
+bevy_rerecast = "0.2.0"
+avian_rerecast = "0.2.0"
+bevy_landmass = "0.9.0"
