@@ -9,10 +9,10 @@ use bevy::{
     window::PrimaryWindow,
 };
 use bevy_landmass::{
-    debug::{EnableLandmassDebug, Landmass3dDebugPlugin}, prelude::ThreeD, Agent3d, Agent3dBundle, AgentDesiredVelocity,
-    AgentDesiredVelocity3d, AgentOptions, AgentSettings, AgentState, AgentTarget3d, Archipelago3d,
-    ArchipelagoRef, ArchipelagoRef3d, FromAgentRadius, Island, Island3dBundle, Landmass3dPlugin, NavMesh,
-    NavMesh3d, NavMeshHandle, NavMeshHandle3d, NavigationMesh3d,
+    debug::{EnableLandmassDebug, Landmass3dDebugPlugin}, prelude::ThreeD, Agent3d, Agent3dBundle, AgentDesiredVelocity3d, AgentOptions,
+    AgentSettings, AgentState, AgentTarget3d, Archipelago3d, ArchipelagoRef, ArchipelagoRef3d,
+    FromAgentRadius, Island, Island3dBundle, Landmass3dPlugin, NavMesh3d,
+    NavMeshHandle, NavigationMesh3d,
     PointSampleDistance3d,
     Velocity3d,
 };
@@ -80,8 +80,6 @@ fn setup_scene(
     });
     let archipelago_id = commands.spawn(archipelago).id();
 
-
-
     let _player = commands
         .spawn((
             Mesh3d(meshes.add(Capsule3d::new(0.4, 1.0))),
@@ -102,8 +100,8 @@ fn setup_scene(
         ))
         .id();
 
-    let mesh_1: Handle<Mesh> = meshes.add(Cuboid::default());
-    let nav_mesh_1 = nav_meshes.reserve_handle();
+    // let mesh_1: Handle<Mesh> = meshes.add(Cuboid::default());
+    // let nav_mesh_1 = nav_meshes.reserve_handle();
 
     // // A cube to move around
     // commands.spawn((
@@ -119,19 +117,15 @@ fn setup_scene(
     //     },
     // ));
 
-    let mesh_2: Handle<Mesh> = assets.load("character_controller_demo.glb#Scene0");
-    let nav_mesh_2 = nav_meshes.reserve_handle();
-
     // Environment (see the `collider_constructors` example for creating colliders from scenes)
     commands.spawn((
         SceneRoot(assets.load("character_controller_demo.glb#Scene0")),
-        Transform::from_rotation(Quat::from_rotation_y(-core::f32::consts::PI * 0.5)),
         ColliderConstructorHierarchy::new(ColliderConstructor::ConvexHullFromMesh),
         RigidBody::Static,
         Island3dBundle {
             island: Island,
             archipelago_ref: ArchipelagoRef::new(archipelago_id),
-            nav_mesh: NavMeshHandle(nav_mesh_2.clone()),
+            nav_mesh: NavMeshHandle(nav_meshes.reserve_handle().clone()),
         },
     ));
 
@@ -149,7 +143,7 @@ fn setup_scene(
     // Camera
     commands.spawn((
         Camera3d::default(),
-        Transform::from_xyz(-7.0, 9.5, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
+        Transform::from_xyz(17.0, 9.5, 15.0).looking_at(Vec3::ZERO, Vec3::Y),
     ));
 }
 
@@ -260,12 +254,6 @@ fn handle_mouse_click(
 
         if let Some(hit) = spatial_query.cast_ray(ray.origin, ray.direction, 100.0, true, &filter) {
             if let Ok(agent_entity) = agent_query.single() {
-                println!(
-                    "Hit entity {} at {} with normal {}",
-                    hit.entity,
-                    ray.origin + *ray.direction * hit.distance,
-                    hit.normal,
-                );
                 commands.entity(agent_entity).insert(AgentTarget3d::Point(
                     ray.origin + *ray.direction * hit.distance,
                 ));
