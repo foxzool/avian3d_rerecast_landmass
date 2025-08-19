@@ -49,7 +49,7 @@ fn main() {
             Update,
             toggle_debug.run_if(input_just_pressed(KeyCode::F12)),
         )
-        .add_systems(Update, (handle_mouse_click,))
+        .add_systems(Update, (handle_mouse_click, clear_agent_target_on_input))
         .add_systems(
             Update,
             (update_agent_velocity, move_agent_by_velocity).chain(),
@@ -257,7 +257,7 @@ fn handle_mouse_click(
                 commands.entity(agent_entity).insert(AgentTarget3d::Point(
                     ray.origin + *ray.direction * hit.distance,
                 ));
-                // info!("Set new target for agent: {:?}", hit.point);
+                // info!("Set new target for agent: {:?}",  ray.origin + *ray.direction * hit.distance,);
             }
         }
     }
@@ -280,6 +280,26 @@ fn move_agent_by_velocity(
             .inverse()
             .transform_vector3(velocity.velocity);
         transform.translation += local_velocity * time.delta_secs();
+    }
+}
+
+/// Clear agent navigation target when WASD movement keys are pressed
+fn clear_agent_target_on_input(
+    mut commands: Commands,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
+    agent_query: Query<Entity, With<Agent3d>>,
+) {
+    let movement_keys = [
+        KeyCode::KeyW, KeyCode::ArrowUp,
+        KeyCode::KeyS, KeyCode::ArrowDown, 
+        KeyCode::KeyA, KeyCode::ArrowLeft,
+        KeyCode::KeyD, KeyCode::ArrowRight,
+    ];
+    
+    if movement_keys.iter().any(|&key| keyboard_input.pressed(key)) {
+        for entity in agent_query.iter() {
+            commands.entity(entity).remove::<AgentTarget3d>();
+        }
     }
 }
 
