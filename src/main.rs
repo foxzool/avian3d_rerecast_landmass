@@ -73,7 +73,7 @@ fn setup_scene(
         point_sample_distance: PointSampleDistance3d {
             horizontal_distance: 0.6,
             distance_above: 1.0,
-            distance_below: 1.0,
+            distance_below: 2.0,
             vertical_preference_ratio: 2.0,
         },
         ..AgentOptions::from_agent_radius(0.6)
@@ -96,7 +96,7 @@ fn setup_scene(
                     max_speed: 3.0,
                 },
             },
-            AgentTarget3d::Point(Vec3::new(4.5, 1.0, 4.5)),
+            // AgentTarget3d::Point(Vec3::new(4.5, 1.0, 4.5)),
         ))
         .id();
 
@@ -290,12 +290,16 @@ fn clear_agent_target_on_input(
     agent_query: Query<Entity, With<Agent3d>>,
 ) {
     let movement_keys = [
-        KeyCode::KeyW, KeyCode::ArrowUp,
-        KeyCode::KeyS, KeyCode::ArrowDown, 
-        KeyCode::KeyA, KeyCode::ArrowLeft,
-        KeyCode::KeyD, KeyCode::ArrowRight,
+        KeyCode::KeyW,
+        KeyCode::ArrowUp,
+        KeyCode::KeyS,
+        KeyCode::ArrowDown,
+        KeyCode::KeyA,
+        KeyCode::ArrowLeft,
+        KeyCode::KeyD,
+        KeyCode::ArrowRight,
     ];
-    
+
     if movement_keys.iter().any(|&key| keyboard_input.pressed(key)) {
         for entity in agent_query.iter() {
             commands.entity(entity).remove::<AgentTarget3d>();
